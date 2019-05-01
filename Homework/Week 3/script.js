@@ -1,11 +1,14 @@
 var fileName = "KNMI_data.json";
 var txtFile = new XMLHttpRequest();
 
+// Makes data into an array with date as index, removing NaN
 function screenData(datapoints) {
+  // Initialises 365 enties in array to list
   let observations = []
   for (let number = 1; number <= 365; number += 1) {
     observations[number] = []
   }
+  // Adds every datapoint to appropriate list in array
   datapoints.forEach(function(observation) {
     if (parseInt(observation["DR"])) {
       i = observation["YYYYMMDD"].substring(4);
@@ -51,6 +54,7 @@ function screenData(datapoints) {
   return observations
 }
 
+// Averages data in array of 365 lists
 function averageData(cleanData) {
   for (i in cleanData){
     var sum = 0
@@ -63,39 +67,81 @@ function averageData(cleanData) {
   return cleanData
 }
 
-txtFile.onreadystatechange = function() {
-  if (txtFile.readyState === 4 && txtFile.status == 200) {
-    datafile = JSON.parse(txtFile.responseText)
-    allAverages = averageData(screenData(datafile))
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+function drawCanvas(data) {
+  // finds canvas on HTML page
+  const canvas = document.getElementById('graph');
+  const ctx = canvas.getContext('2d');
 
-    // finds canvas on HTML page
-    const canvas = document.getElementById('graph');
-    const ctx = canvas.getContext('2d');
+  // Set line width and font sizess
+  ctx.lineWidth = 1;
+  ctx.font = "15px Arial";
 
-    // Set line width
-    ctx.lineWidth = 1;
+  // Sets walls of graph
+  ctx.strokeRect(150, 30, 935, 380);
 
-    // Sets walls of graph
-    ctx.strokeRect(20, 30, 940, 380);
+  // Fills in y-values
+  ctx.fillText("-10", 127, 400);
+  ctx.fillText("-5", 133, 350);
+  ctx.fillText("0", 137, 300);
+  ctx.fillText("5", 137, 250);
+  ctx.fillText("10", 131, 200);
+  ctx.fillText("15", 131, 150);
+  ctx.fillText("20", 131, 100);
+  ctx.fillText("25", 131, 50);
 
-    for (i in allAverages){
-      if (parseInt(i) == 1) {
-        ctx.moveTo(20 + (parseInt(i)) * 2.8, 300 - (parseInt(allAverages[parseInt(i)])));
-      }
-      else{
-        ctx.lineTo(20 + (parseInt(i)) * 2.8, 300 - (parseInt(allAverages[parseInt(i)])));
-        ctx.moveTo(20 + (parseInt(i)) * 2.8, 300 - (parseInt(allAverages[parseInt(i)])));
-      }
-      for (i in months){
-        ctx.font = "15px Arial";
-        ctx.fillText(months[i], (parseInt(i)) * 80 + 20, 425);
-      }
-      ctx.font = "25px Arial";
-      ctx.fillText("Average lowest temperature measured for each day in the Netherlands in 2018", 50, 25);
+  // Fills in title and x-header
+  ctx.font = "25px Arial";
+  ctx.fillText("Average lowest temperature measured for each day in the Netherlands in 2018", 175, 25);
+  ctx.fillText("Month", 575, 450);
+
+  // Fills in x-values
+  months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+  for (i in months){
+    ctx.font = "15px Arial";
+    ctx.fillText(months[i] + " 1", (parseInt(i)) * 78 + 145, 425);
+  }
+
+  // Adds dashed lines so user can see when each month is
+  ctx.beginPath();
+  ctx.setLineDash([5, 3]);
+  for (i = 1; i < 12; i++){
+    ctx.moveTo(i * 78 + 150, 410);
+    ctx.lineTo(i * 78 + 150, 30);
+  }
+  ctx.stroke();
+
+  // Adds line at 0 degrees
+  ctx.beginPath();
+  ctx.setLineDash([])
+  ctx.moveTo(150, 300)
+  ctx.lineTo(1085, 300)
+
+  // Moves through the data and draws line accordingly
+  for (i in data){
+    if (parseInt(i) == 1) {
+      ctx.moveTo(150 + (parseInt(i)) * 2.8, 300 - (parseInt(data[parseInt(i)])));
     }
+    else{
+      ctx.lineTo(150 + (parseInt(i)) * 2.8, 300 - (parseInt(data[parseInt(i)])));
+      ctx.moveTo(150 + (parseInt(i)) * 2.8, 300 - (parseInt(data[parseInt(i)])));
+    }
+  }
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.rotate( - Math.PI / 2 );
+  ctx.fillText('Temp', 50, 300)
+
+
   ctx.closePath();
   ctx.stroke();
+}
+
+txtFile.onreadystatechange = function() {
+  if (txtFile.readyState === 4 && txtFile.status == 200) {
+    // Opens JSON file, screens and averages the data for each day
+    datafile = JSON.parse(txtFile.responseText)
+    allAverages = averageData(screenData(datafile))
+    drawCanvas(allAverages)
   }
 }
 txtFile.open("GET", fileName);
