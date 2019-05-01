@@ -1,7 +1,6 @@
 import csv
 import json
 
-
 # initialises csv infile, json outfile and names each field
 infile = "KNMI_data.txt"
 fieldnames = "STN", "YYYYMMDD", "DR"
