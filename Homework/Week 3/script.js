@@ -11,9 +11,11 @@ function screenData(datapoints) {
   // Adds every datapoint to appropriate list in array
   datapoints.forEach(function(observation) {
     if (parseInt(observation["DR"])) {
+      // finds month and day belonging to datapoint
       i = observation["YYYYMMDD"].substring(4);
       month = parseInt(i[0] + i[1]);
       day = parseInt(i[2] + i[3]);
+      // Converts days and months to day of the year
       var days = day
       if (month == 2) {
         days = days + 31;
@@ -63,7 +65,6 @@ function averageData(cleanData) {
     }
     cleanData[i] = sum / cleanData[i].length;
   }
-  console.log(cleanData[1])
   return cleanData
 }
 
