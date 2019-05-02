@@ -89,19 +89,34 @@ function drawCanvas(data) {
   ctx.fillText("20", 131, 100);
   ctx.fillText("25", 131, 50);
 
-  // Fills in title and x-header
+  // Fills in title
   ctx.font = "25px Arial";
   ctx.fillText("Average lowest temperature measured for each day in the Netherlands in 2018", 175, 25);
+
+  // Fills in x-label
+  ctx.font = "20px Arial";
   ctx.fillText("Month", 575, 450);
 
+  // Saves current context, sets orientation and turns 90 degrees
+  ctx.save();
+  ctx.translate( 500, 0 );
+  ctx.rotate(Math.PI / 2);
+
+  // Fills in  y-label
+  ctx.fillText("Average temperature in C", 100, 400 );
+
+  // Restores original context and orientation
+  ctx.restore();
+
+  ctx.fillStyle = "#000044";
   // Fills in x-values
   months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
   for (i in months){
-    ctx.font = "15px Arial";
+    ctx.font = "14px Serif";
     ctx.fillText(months[i] + " 1", (parseInt(i)) * 78 + 145, 425);
   }
 
-  // Adds dashed lines so user can see when each month is
+  // Adds dashed lines for each month
   ctx.beginPath();
   ctx.setLineDash([5, 3]);
   for (i = 1; i < 12; i++){
@@ -128,8 +143,7 @@ function drawCanvas(data) {
   }
   ctx.stroke();
   ctx.beginPath();
-  ctx.rotate( - Math.PI / 2 );
-  ctx.fillText('Temp', 50, 300)
+
 
 
   ctx.closePath();
@@ -141,6 +155,8 @@ txtFile.onreadystatechange = function() {
     // Opens JSON file, screens and averages the data for each day
     datafile = JSON.parse(txtFile.responseText)
     allAverages = averageData(screenData(datafile))
+
+    // Draws graph based on averaged data
     drawCanvas(allAverages)
   }
 }
