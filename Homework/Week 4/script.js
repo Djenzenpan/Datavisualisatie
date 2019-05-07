@@ -23,7 +23,7 @@ function basics() {
     .style("font-family", "Monospace");
 
   // Displays explanatory text
-  d3.select("body").append("p").text("A bit of text");
+  d3.select("body").append("p").text("A bit of explanatory text");
 
   // Displays name and student number and sets font for both
   d3.select("body").append("a").text("Jesse Pannekeet");
@@ -36,7 +36,7 @@ function basics() {
   d3.select("body").style("text-align", "center");
 }
 
-function convertToBars(datafile) {
+function convertToBarGraph(datafile) {
   var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
   var scale = d3.scaleLinear()
                 .domain([0, d3.max(datafile, function(d) { return d; })])
@@ -68,7 +68,7 @@ txtFile.onreadystatechange = function() {
     // Opens clean JSON file and converts it to a bar graph
     datafile = JSON.parse(txtFile.responseText)
     basics();
-    convertToBars(datafile);
+    convertToBarGraph(datafile);
   }
 }
 txtFile.open("GET", fileName);
