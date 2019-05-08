@@ -9,7 +9,7 @@ var h = 450;
 var barWidth = 15;
 var distanceBtwnBars = barWidth + 3;
 
-// Remembers graph title and first year
+// Remembers graph title, graph text and first year
 var graphText = "This bar chart contains averaged data of all countries' \
                  value for each year between 1960 and 2016. \
                  Data comes from the OECD";
