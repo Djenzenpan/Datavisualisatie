@@ -43,7 +43,7 @@ function basics() {
 }
 
 // Converts data to bargraph
-function convertToBarGraph(datafile) {
+function BarGraphOnSvg(datafile) {
 
   // Adds svg element to index.html
   var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
@@ -95,7 +95,7 @@ function convertToBarGraph(datafile) {
      .attr("transform", function(d,i){
             return "translate(" + (40 + (i*distanceBtwnBars)) + "," +
                               (360 - (d/45)) + ")"
-          })
+          });
 
   // Plots axes
   svg.append("g").attr("class", "axis").call(xAxis)
@@ -118,7 +118,7 @@ txtFile.onreadystatechange = function() {
     // Opens clean JSON file and converts it to a bar graph
     datafile = JSON.parse(txtFile.responseText)
     basics();
-    convertToBarGraph(datafile);
+    BarGraphOnSvg(datafile);
     }
   }
 txtFile.open("GET", fileName);
