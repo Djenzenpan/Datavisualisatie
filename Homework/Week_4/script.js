@@ -62,7 +62,7 @@ function BarGraphOnSvg(datafile) {
                             .range([400, 0]));
 
   // Plots bar graph in svg element in index.html
-  svg.selectAll("rect").data(datafile).enter().append("rect")
+  svg.selectAll("rect").data(data).enter().append("rect")
 
     // Sets size and location of bars
     .style("width", barWidth)
