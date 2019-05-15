@@ -16,7 +16,7 @@ window.onload = function() {
   Promise.all(requests).then(function(response) {
     cleanData = convertToUsableData(response);
     selectMenu(cleanData);
-    scatterPlot(cleanData[8]);
+    scatterPlot(cleanData[0]);
   })
 };
 
@@ -109,7 +109,7 @@ function convertToUsableData(data){
     }
   }
 
-  // Todo
+  // Converts dataset to a more usable form
   allData = []
   for (index in dataOne){
     intermediate = [];
@@ -124,15 +124,18 @@ function convertToUsableData(data){
 };
 
 function basics() {
-  graphTitle = "ToDo"
+  graphTitle = "The scatterplot shown beneath shows the relationship between the percentage of teens that report living in a violent area and teenage pregnancy for the selected country. The size of the circles corresponds to the length of the country name"
 
   // Displays page title
   d3.select("head").append("title").text("Teens in violent area/Teen pregnancy");
 
-  // Displays title of body and sets font
-  d3.select("body").append("h2").text(graphTitle)
-    .style("text-decoration", "underline")
+  d3.select("body").append("h2").text("Scatterplot")
     .style("font-family", "Monospace");
+
+  // Displays title of body and sets font
+  d3.select("body").append("p").text(graphTitle)
+    .style("font-family", "Monospace")
+    .style("text-align", "center");
 
   // Displays name and student number and sets font for both
   d3.select("body").append("a").text("Jesse Pannekeet");
@@ -176,6 +179,12 @@ function scatterPlot(data) {
   svg.append("g").attr("class", "axis").call(yAxis)
      .attr("transform", "translate(45, 0)");
 
+  svg.append("text")
+     .attr("transform", "translate(410, 40)")
+     .style("text-anchor", "middle").style("font-family", "Arial")
+     .style("font-size", "15px")
+     .text(data[0]);
+
   // Plots axes labels
   svg.append("text").attr("transform", "translate(410, 435)")
      .style("text-anchor", "middle").style("font-family", "Arial")
@@ -207,7 +216,8 @@ function scatterPlot(data) {
 };
 
 function selectMenu(data) {
-  selectMenu = d3.select("body").append("select").attr("width", "250px")
+  selMen = d3.select("body").append("div").attr("class", "selMen")
+  selectMenu = selMen.append("select").attr("width", "250px")
                  .attr('class','select').attr("name", "Select-menu");
   selectMenu.selectAll("option").data(data).enter().append("option")
             .text(function(d) { return d[0]; });
