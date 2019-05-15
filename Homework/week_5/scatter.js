@@ -5,9 +5,9 @@
 window.onload = function() {
 
   // Loads datasets and converts them to json files
-  var teensInViolentArea = "https://stats.oecd.org/SDMX-JSON/data/CWB/AUT+BEL+BEL-VLG+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+NMEC+BRA+BGR+HRV+CYP+MLT+PER+ROU.CWB11/all?startTime=2010&endTime=2015"
-  var teenPregnancies = "https://stats.oecd.org/SDMX-JSON/data/CWB/AUT+BEL+BEL-VLG+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+NMEC+BRA+BGR+HRV+CYP+MLT+PER+ROU.CWB46/all?startTime=2010&endTime=2015"
-  var gdp = "https://stats.oecd.org/SDMX-JSON/data/SNA_TABLE1/AUT+BEL+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+BGR+HRV+CYP+MLT+ROU.B1_GE.HCPC/all?startTime=2010&endTime=2015&dimensionAtObservation=allDimensions"
+  var teensInViolentArea = "https://stats.oecd.org/SDMX-JSON/data/CWB/AUT+BEL+BEL-VLG+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+NMEC+BRA+BGR+HRV+CYP+MLT+PER+ROU.CWB11/all?startTime=2000&endTime=2015"
+  var teenPregnancies = "https://stats.oecd.org/SDMX-JSON/data/CWB/AUT+BEL+BEL-VLG+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+NMEC+BRA+BGR+HRV+CYP+MLT+PER+ROU.CWB46/all?startTime=2000&endTime=2015"
+  var gdp = "https://stats.oecd.org/SDMX-JSON/data/SNA_TABLE1/AUT+BEL+CZE+DNK+EST+FIN+FRA+GRC+HUN+ISL+IRL+ITA+LVA+LTU+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+GBR+BGR+HRV+CYP+MLT+ROU.B1_GE.HCPC/all?startTime=2000&endTime=2015&dimensionAtObservation=allDimensions"
   var requests = [d3.json(teensInViolentArea), d3.json(teenPregnancies), d3.json(gdp)];
 
   // Implements basics like page title and name
@@ -15,7 +15,8 @@ window.onload = function() {
 
   Promise.all(requests).then(function(response) {
     cleanData = convertToUsableData(response);
-    scatterPlot(cleanData[0])
+    selectMenu(cleanData);
+    scatterPlot(cleanData[8]);
   })
 };
 
@@ -92,20 +93,30 @@ function convertToUsableData(data){
   };
 
   // Cleans data from every json_file
-  allData = cleanOECDDataFormat0(data[0])
+  dataOne = cleanOECDDataFormat0(data[0])
   dataTwo = cleanOECDDataFormat0(data[1])
   dataThree = cleanOECDDataFormat1(data[2])
 
   // Fuses datasets together
-  for (index = 0; index < allData.length; index++) {
-    allData[index].push(dataTwo[index][1])
+  for (index = 0; index < dataOne.length; index++) {
+    dataOne[index].push(dataTwo[index][1])
   }
   for (index in dataThree){
-    for (country in allData) {
-      if (dataThree[index][0] == allData[country][0]) {
-        allData[country].push(dataThree[index][1])
+    for (country in dataOne) {
+      if (dataThree[index][0] == dataOne[country][0]) {
+        dataOne[country].push(dataThree[index][1])
       }
     }
+  }
+
+  // Todo
+  allData = []
+  for (index in dataOne){
+    intermediate = [];
+    for (year in dataOne[index][1]){
+      intermediate.push([dataOne[index][1][year], dataOne[index][2][year], dataOne[index][3][year], dataOne[index][0].length])
+    }
+    allData.push([dataOne[index][0], intermediate])
   }
   console.log(allData)
   // Returns clean and fused data from the three datafiles provided
@@ -135,46 +146,80 @@ function basics() {
 };
 
 function scatterPlot(data) {
-  var w = 1150;
+  var w = 800;
   var h = 450;
 
   var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
 
   // Sets scale
   var xScale = d3.scaleLinear()
-                 .domain([0, d3.max(data[1], function(d) { return d; })])
-                 .range([0, h - 50]);
+                 .domain([0, d3.max(data[1], function(d) { return d[0]; })])
+                 .range([10, w - 50]);
+  // Sets scale
   var yScale = d3.scaleLinear()
-                 .domain([0, d3.max(data[2], function(d) { return d; })])
-                 .range([0, h - 50]);
+                 .domain([0, d3.max(data[1], function(d) { return d[1]; })])
+                 .range([50, h - 50]);
 
   // Sets x and y axis range
   var xAxis = d3.axisBottom(d3.scaleLinear()
-                              .domain([0, d3.max(data[1], function(d){
-                                                          return d; })])
-                              .range([15, 1037]));
+                              .domain([0, d3.max(data[1], function(d) {
+                                                           return d[0]; })])
+                              .range([10, w - 50]));
   var yAxis = d3.axisLeft(d3.scaleLinear()
-                            .domain([0, d3.max(data[2], function(d) {
-                                                         return d; })])
-                            .range([400, 0]));
+                            .domain([0, d3.max(data[1], function(d) {
+                                                        return d[1]; })])
+                            .range([h - 50, 50]));
 
   // Plots axes
   svg.append("g").attr("class", "axis").call(xAxis)
      .attr("transform", "translate(35, 400)");
   svg.append("g").attr("class", "axis").call(yAxis)
-     .attr("transform", "translate(50, 0)");
+     .attr("transform", "translate(45, 0)");
 
   // Plots axes labels
-  svg.append("text").attr("transform", "translate(578, 435)")
+  svg.append("text").attr("transform", "translate(410, 435)")
      .style("text-anchor", "middle").style("font-family", "Arial")
-     .text("Every year between 1960-2016");
-  svg.append("text").attr("transform", "rotate(-90)").attr("y", 12)
-     .attr("x", -175).style("text-anchor", "middle")
-     .style("font-family", "Arial").text("Average value ($)");
+     .style("font-size", "15px")
+     .text("Percentage of teens that report living in a violent neighbourhood");
+  svg.append("text").attr("transform", "rotate(-90)").attr("y", 15)
+     .attr("x", -205).style("text-anchor", "middle")
+     .style("font-family", "Arial").style("font-size", "15px")
+     .text("Teenage pregnancy rate(/1000 teens)");
 
-  // Plots bar graph in svg element in index.html
+
   svg.selectAll("circle").data(data[1]).enter().append("circle")
-     .attr("cx", function(d){ return xScale(d); })
-     .attr("cy", function(d){ return yScale(d); })
-     .attr("r", 10);
+    .attr("cx", function(d){ return xScale(d[0]); })
+    .attr("cy", function(d){ return yScale(d[1]) - 50; })
+    .attr("r", function(d){ return d[3] / 2})
+    .style("fill", function(d){ if (d[2] < 15000){ return "ccece6" }
+                                else if (d[2] < 19000) { return "99d8c9"}
+                                else if (d[2] < 23000) { return "66c2a4"}
+                                else if (d[2] < 27000) { return "41ae76"}
+                                else if (d[2] < 31000) { return "238b45"}
+                                else if (d[2] < 35000) { return "006d2c"}
+                                else { return "00441b" }});
+  legend = svg.append("g")
+              .attr("class","legend")
+              .attr("transform","translate(50,30)")
+              .style("font-size","12px")
+              .call(d3.legend)
+
 };
+
+function selectMenu(data) {
+  selectMenu = d3.select("body").append("select").attr("width", "250px")
+                 .attr('class','select').attr("name", "Select-menu");
+  selectMenu.selectAll("option").data(data).enter().append("option")
+            .text(function(d) { return d[0]; });
+  selectMenu.on("change", function() { switchDots(d3.select("select")
+                                                    .property("value"), data); })
+};
+
+function switchDots(country, data) {
+  d3.selectAll("svg").remove();
+  for (i in data) {
+    if (data[i][0] == country) {
+      scatterPlot(data[i])
+    }
+  }
+}
