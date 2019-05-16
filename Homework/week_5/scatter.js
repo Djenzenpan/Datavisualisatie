@@ -114,7 +114,8 @@ function convertToUsableData(data){
   for (index in dataOne){
     intermediate = [];
     for (year in dataOne[index][1]){
-      intermediate.push([dataOne[index][1][year], dataOne[index][2][year], dataOne[index][3][year], dataOne[index][0].length])
+      intermediate.push([dataOne[index][1][year], dataOne[index][2][year],
+                         dataOne[index][3][year], dataOne[index][0].length])
     }
     allData.push([dataOne[index][0], intermediate])
   }
@@ -124,7 +125,7 @@ function convertToUsableData(data){
 };
 
 function basics() {
-  graphTitle = "The scatterplot shown beneath shows the relationship between the percentage of teens that report living in a violent area and teenage pregnancy for the selected country. The size of the circles corresponds to the length of the country name"
+  graphTitle = "The scatterplot shown beneath shows the relationship between the percentage of teens that report living in a violent area and teenage pregnancy for the selected country. The colour of the circle corresponds to that year's gdp and the size of the circles corresponds to the length of the country name"
 
   // Displays page title
   d3.select("head").append("title").text("Teens in violent area/Teen pregnancy");
@@ -173,19 +174,18 @@ function scatterPlot(data) {
                                                         return d[1]; })])
                             .range([h - 50, 50]));
 
-  // Plots axes
+  // Sets title
+  svg.append("text").attr("transform", "translate(410, 40)")
+     .style("text-anchor", "middle").style("font-family", "Arial")
+     .style("font-size", "15px").text(data[0]);
+
+  // Sets axes
   svg.append("g").attr("class", "axis").call(xAxis)
      .attr("transform", "translate(35, 400)");
   svg.append("g").attr("class", "axis").call(yAxis)
      .attr("transform", "translate(45, 0)");
 
-  svg.append("text")
-     .attr("transform", "translate(410, 40)")
-     .style("text-anchor", "middle").style("font-family", "Arial")
-     .style("font-size", "15px")
-     .text(data[0]);
-
-  // Plots axes labels
+  // Sets axes labels
   svg.append("text").attr("transform", "translate(410, 435)")
      .style("text-anchor", "middle").style("font-family", "Arial")
      .style("font-size", "15px")
@@ -195,7 +195,7 @@ function scatterPlot(data) {
      .style("font-family", "Arial").style("font-size", "15px")
      .text("Teenage pregnancy rate(/1000 teens)");
 
-
+  // Plots datacircles
   svg.selectAll("circle").data(data[1]).enter().append("circle")
     .attr("cx", function(d){ return xScale(d[0]); })
     .attr("cy", function(d){ return yScale(d[1]) - 50; })
@@ -207,12 +207,24 @@ function scatterPlot(data) {
                                 else if (d[2] < 31000) { return "238b45"}
                                 else if (d[2] < 35000) { return "006d2c"}
                                 else { return "00441b" }});
-  legend = svg.append("g")
-              .attr("class","legend")
-              .attr("transform","translate(50,30)")
-              .style("font-size","12px")
-              .call(d3.legend)
 
+  // Sets legend
+  svg.append("rect").attr("transform", "translate(650, 34)").attr("width", "130").attr("height", "72").attr("fill", "rgba(0,0,0,0)").style("stroke", "000000");
+  svg.append("text").attr("transform", "translate(653, 44)").style("font-size", "9px").text("Colour legend (gdp for that year)")
+  svg.append("circle").attr("transform", "translate(657, 50)").attr("r", "3").style("fill", "ccece6")
+  svg.append("text").attr("transform", "translate(665, 53)").style("font-size", "8px").text("0 - 15000")
+  svg.append("circle").attr("transform", "translate(657, 58)").attr("r", "3").style("fill", "99d8c9")
+  svg.append("text").attr("transform", "translate(665, 61)").style("font-size", "8px").text("15000 - 19000")
+  svg.append("circle").attr("transform", "translate(657, 66)").attr("r", "3").style("fill", "66c2a4")
+  svg.append("text").attr("transform", "translate(665, 69)").style("font-size", "8px").text("19000 - 23000")
+  svg.append("circle").attr("transform", "translate(657, 74)").attr("r", "3").style("fill", "41ae76")
+  svg.append("text").attr("transform", "translate(665, 77)").style("font-size", "8px").text("23000 - 27000")
+  svg.append("circle").attr("transform", "translate(657, 82)").attr("r", "3").style("fill", "238b45")
+  svg.append("text").attr("transform", "translate(665, 85)").style("font-size", "8px").text("27000 - 31000")
+  svg.append("circle").attr("transform", "translate(657, 90)").attr("r", "3").style("fill", "006d2c")
+  svg.append("text").attr("transform", "translate(665, 93)").style("font-size", "8px").text("31000 - 35000")
+  svg.append("circle").attr("transform", "translate(657, 98)").attr("r", "3").style("fill", "00441b")
+  svg.append("text").attr("transform", "translate(665, 101)").style("font-size", "8px").text("35000+")
 };
 
 function selectMenu(data) {
