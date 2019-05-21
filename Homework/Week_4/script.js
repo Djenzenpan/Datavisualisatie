@@ -1,4 +1,4 @@
-var fileName = "average_data.json";
+var fileName = "https//djenzenpan.github.io/Datavisualisatie/Homework/Week_4/average_data.json"
 var txtFile = new XMLHttpRequest();
 
 // Sets width and height of SVG object
