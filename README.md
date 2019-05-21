@@ -1,6 +1,6 @@
 # Datavisualisatie
 Github pages: https://djenzenpan.github.io/Datavisualisatie/ <br />
-Homework:<br />
+<p>Homework:<br />
 week 1: Homework/week_1<br />
 week 2: Homework/week_2<br />
 week 3: Homework/week_3<br />
