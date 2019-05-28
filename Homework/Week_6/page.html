@@ -3,13 +3,39 @@
 <!--10151494-->
 
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <link rel = "stylesheet" type = "text/css" href = "linked.css" />
-    </head>
-    <body>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="script.js"></script>
-    </body>
+<html>
+  <head>
+    <style>
+       .active { fill: blue !important;}
+       /*.datamaps-key dt, .datamaps-key dd {float: none !important;}
+       .datamaps-key {right: -50px; top: 0;}*/
+    </style>
+    <meta charset="utf-8">
+    <title>Linked views</title>
+
+    <!-- Import D3 V5 -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+      d3v5 = d3;
+      window.d3 = null;
+    </script>
+
+    <!-- Import D3 V3 and TopoJSON -->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="https://datamaps.github.io/scripts/datamaps.world.min.js"></script>
+    <script>
+      d3v3 = d3;
+      window.d3 = null;
+
+    </script>
+
+    <!-- REST OF IMPORTS HERE -->
+    <script src="script.js"></script>
+
+  </head>
+  <body>
+    <div id="container" style="position: relative; width: 700px; height: 450px;"></div>
+
+  </body>
 </html>
