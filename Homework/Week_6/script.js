@@ -1,9 +1,18 @@
 var fileName = "final_data.json"
 var txtFile = new XMLHttpRequest();
 
-function scatterplot(allData, continent) {
-  var w = 800;
+function scatterplot(country, allData) {
+
+  d3v5.selectAll("#scatter").remove();
+  d3v5.selectAll("body").style("text-align", "centre")
+  var w = 850;
   var h = 450;
+
+  for (i in allData) {
+    if (allData[i]["Country code"] == country) {
+      continent = allData[i]["Region"]
+    }
+  }
 
   data = [];
 
@@ -13,7 +22,14 @@ function scatterplot(allData, continent) {
     }
   }
 
-  var svg = d3v5.select("body").append("svg").attr("width", w).attr("height", h);
+//  var tip = d3v5.tip()
+  //.attr('class', 'd3-tip')
+  //.offset([-10, 0])
+  //.html(data, function(d) {
+  //  return "You're touching my!";
+  //});
+
+  var svg = d3v5.select("body").append("svg").attr("id", "scatter").attr("width", w).attr("height", h);
 
   // Sets scale
   var xScale = d3v5.scaleLinear()
@@ -34,9 +50,6 @@ function scatterplot(allData, continent) {
                                                         return d["Footprint (gha/capita)"]; })])
                             .range([h - 50, 50]));
 
-  tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
-
-  vis.call(tip)
 
   // Sets title
   svg.append("text").attr("transform", "translate(410, 40)")
@@ -66,46 +79,53 @@ function scatterplot(allData, continent) {
     .attr("cy", function(d){ return yScale(d["Footprint (gha/capita)"]) - 10; })
     .style("fill", "000000")
     .attr("r", "5px")
-    .on('mouseover', tip.show)
-    .on('mouseout', tip.hide)
+
 
 }
 // ToDO onload function
 txtFile.onreadystatechange = function() {
   if (txtFile.readyState === 4 && txtFile.status == 200) {
+
+    // Sets whole body to center of page
+    d3v5.select("body")
+        .style("text-align", "center");
+
+    // Creates div for the datamap to reside in
+    d3v3.select("body")
+        .append("div")
+        .attr("id", "container")
+        .style("position", "relative")
+        .style("width", "700px")
+        .style("height", '450px')
+        .style("margin", "auto");
+
     // Opens JSON file
     datafile = JSON.parse(txtFile.responseText)
-    countries_happy_index = []
+
+    // Gets neccesary info from JSON file
+    series = []
     for (country in datafile) {
-      countries_happy_index.push([datafile[country]["Country code"], datafile[country]["Happy Planet Index"]])
+      series.push([datafile[country]["Country code"], parseInt(datafile[country]["Happy Planet Index"])])
     }
 
-      // Datamaps expect data in format:
-    // { "USA": { "fillColor": "#42a844", numberOfWhatever: 75},
-    //   "FRA": { "fillColor": "#8dc386", numberOfWhatever: 43 } }
+    //
     var dataset = {};
-
-    // We need to colorize every country based on "numberOfWhatever"
-    // colors should be uniq for every value.
-    // For this purpose we create palette(using min/max series-value)
-    var onlyValues = countries_happy_index.map(function(obj){ return parseFloat(obj[1]); });
+    var onlyValues = series.map(function(obj){ return parseFloat(obj[1]); });
+    console.log(onlyValues)
     var minValue = Math.min.apply(null, onlyValues),
             maxValue = Math.max.apply(null, onlyValues);
 
-    // create color palette function
-    // color can be whatever you wish
+    // Adds Colour palette
     var paletteScale = d3v3.scale.linear()
             .domain([minValue,maxValue])
-            .range(["#888888","#02386F"]); // blue color
+            .range(["#ece7f2","#2b8cbe"]); // blue color
 
     // fill dataset in appropriate format
-    countries_happy_index.forEach(function(item){ //
+    series.forEach(function(item){ //
         // item example value ["USA", 70]
         var iso = item[0],
                 value = item[1]
-        dataset[iso] = { fillColor: paletteScale(value).toUpperCase(), numberOfThings: value  };
-        console.log(iso)
-        console.log(dataset[iso])
+        dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
     });
 
     // render map
@@ -115,13 +135,15 @@ txtFile.onreadystatechange = function() {
         // countries don't listed in dataset will be painted with this color
         fills: { defaultFill: '#F5F5F5' },
         data: dataset,
-        fills: function(data) { return data.fillColor},
+        done: function(data) {
+            data.svg.selectAll('.datamaps-subunit').on('click', function(geo) {
+                scatterplot(geo["id"], datafile) })},
         geographyConfig: {
-            borderColor: '#DEDEDE',
+            borderColor: '#000000',
             highlightBorderWidth: 2,
             // don't change color on mouse hover
-            highlightFillColor: function(data) {
-                return "purple";
+            highlightFillColor: function(geo) {
+                return '#FEFEFE';
             },
             // only change border
             highlightBorderColor: '#B7B7B7',
@@ -132,17 +154,12 @@ txtFile.onreadystatechange = function() {
                     '<strong>', geo.properties.name, '</strong>',
                     '<br>No data available <strong>', '</div>'].join(''); }
                 // tooltip content
-                console.log(data.fillKey)
                 return ['<div class="hoverinfo">',
                     '<strong>', geo.properties.name, '</strong>',
                     '<br>Happy planet index: <strong>', data.numberOfThings, '</strong>',
-                    '</div>'].join('');
-            }
-        }
-    });
-    scatterplot(datafile, "Americas")
+                    '</div>'].join('');},
 
-  }
-}
+                  }});
+}}
 txtFile.open("GET", fileName);
 txtFile.send();
