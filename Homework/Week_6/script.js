@@ -43,7 +43,7 @@ window.onload = function() {
         .append("p")
         .style("width", "800px")
         .style("margin", "auto")
-        .text("Happy life expectancy (HLE) is calculated by multiplying life expectancy by a happiness index. The first uses life expectancy at birth. The happiness index is the average appreciation of life (with a value from 0 to 1) from the world databases of happiness.");
+        .text("Happy life years are calculated by multiplying life expectancy by a happiness index. The first uses life expectancy at birth. The happiness index is the average appreciation of life (with a value from 0 to 1) from the world databases of happiness.");
 
     // Adds source
     d3v5.select("body")
