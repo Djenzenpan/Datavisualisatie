@@ -67,7 +67,7 @@ function worldMap(allData) {
   series = []
   for (country in datafile) {
     series.push([datafile[country]["Country code"],
-    parseInt(datafile[country]["Happy Planet Index"])])
+    datafile[country]["Happy Planet Index"]])
   }
 
   // Finds specified values and their minimum and maximum
@@ -86,7 +86,7 @@ function worldMap(allData) {
       // item example value ["USA", 70]
       var iso = item[0],
               value = item[1]
-      dataset[iso] = { HappyPlanetIndexThings: value, fillColor: paletteScale(value) };
+      dataset[iso] = { HappyPlanetIndex: value, fillColor: paletteScale(value) };
   });
 
   // renders map based on dataset
@@ -151,22 +151,6 @@ function scatterPlot(country, allData) {
                 .attr("width", w)
                 .attr("height", h);
 
-
-  var tip = d3v5.select('#scatter')
-                .append('div')
-                .attr('class', 'tip')
-                .html('I am a tooltip...')
-                .style('border', '1px solid steelblue')
-                .style('padding', '5px')
-                .style('position', 'absolute')
-                .style('display', 'none')
-                .on('mouseover', function(d, i) {
-                  tip.transition().duration(0);
-                })
-                .on('mouseout', function(d, i) {
-                  tip.style('display', 'none');
-                });
-
   // Sets x and y scales
   var xScale = d3v5.scaleLinear()
                  .domain([0, d3v5.max(data, function(d) {
@@ -221,6 +205,8 @@ function scatterPlot(country, allData) {
      .style("font-size", "15px")
      .text("Happy Life Years");
 
+     console.log(data)
+
   // Plots datacircles
   svg.selectAll("circle")
      .data(data)
@@ -228,17 +214,26 @@ function scatterPlot(country, allData) {
      .append("circle")
      .attr("cx", function(d){ return xScale(d["Happy Planet Index"]); })
      .attr("cy", function(d){ return yScale(parseInt(d["Happy Life Years"])) - 10; })
-     .style("fill", "000000")
      .attr("r", "5px")
-     .on('mouseover', function(d, i) {
-        tip.transition().duration(0);
-        tip.style('top', "-400");
-        tip.style('left', "-400");
-        tip.style('display', 'block');
+     .attr('stroke','red')
+     .style("fill", "FF0000")
+     .on("mouseover", function (d, i) {
+       d3v5.select("#" + d["Country code"]).transition().attr("opacity", "1")
      })
-     .on('mouseout', function(d, i) {
-        tip.transition()
-        .delay(500)
-        .style('display', 'none');
-    });
+     .on("mouseout", function (d, i) {
+       d3v5.select("#" + d["Country code"]).transition().attr("opacity", "0")
+     });
+
+  // Sets tooltips
+  svg.selectAll("#scatter")
+     .data(data)
+     .enter()
+     .append("text")
+     .text(function(d,i){ return (d["Country"])} )
+     .attr("fill", "black")
+     .attr("opacity", "0")
+     .attr("id", function(d, i){ return d["Country code"] })
+     .attr("transform", function(d,i){
+       return "translate(" + xScale(d["Happy Planet Index"]) + "," + (yScale(d["Happy Life Years"]) - 10) + ")"
+     });
 }
