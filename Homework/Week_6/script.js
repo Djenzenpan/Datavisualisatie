@@ -39,12 +39,11 @@ window.onload = function() {
         .style("width", "800px")
         .style("margin", "auto")
         .text("The Happy Planet Index (HPI) is an index of human well-being and environmental impact that was introduced by the New Economics Foundation (NEF) in July 2006. The index is weighted to give progressively higher scores to nations with lower ecological footprints.");
-
-        d3v5.select("body")
-            .append("p")
-            .style("width", "800px")
-            .style("margin", "auto")
-            .text("Happy life expectancy (HLE) is calculated by multiplying life expectancy by a happiness index. The first uses life expectancy at birth. The happiness index is the average appreciation of life (with a value from 0 to 1) from the world databases of happiness.");
+    d3v5.select("body")
+        .append("p")
+        .style("width", "800px")
+        .style("margin", "auto")
+        .text("Happy life expectancy (HLE) is calculated by multiplying life expectancy by a happiness index. The first uses life expectancy at birth. The happiness index is the average appreciation of life (with a value from 0 to 1) from the world databases of happiness.");
 
     // Adds source
     d3v5.select("body")
@@ -55,7 +54,6 @@ window.onload = function() {
         .append("a")
         .attr("href", "http://happyplanetindex.org/s/hpi-data-2016.xlsx")
         .text("Happy planet index");
-
   }
 
   // Plots worldmap based on data
@@ -71,16 +69,16 @@ window.onload = function() {
         .style("margin", "auto");
 
     // Gets neccesary info from JSON file
-    var series = [];
+    var data = [];
     for (country in datafile) {
-      series.push([datafile[country]["Country code"],
+      data.push([datafile[country]["Country code"],
       datafile[country]["Happy Planet Index"],
       datafile[country]["GDP/capita ($PPP)"]]);
     }
 
     // Finds specified values and their minimum and maximum
     var dataset = {};
-    var score = series.map(function(obj){ return parseFloat(obj[1]); });
+    var score = data.map(function(obj){ return parseFloat(obj[1]); });
     var minValue = Math.min.apply(null, score);
     var maxValue = Math.max.apply(null, score);
 
@@ -90,7 +88,7 @@ window.onload = function() {
                            .range(["#ece7f2","#2b8cbe"]);
 
     // Converts dataset to appropriate format
-    series.forEach(function(item){
+    data.forEach(function(item){
         var country = item[0];
         var happy = item[1];
         var gdp = item[2];
